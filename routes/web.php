@@ -20,5 +20,9 @@ $router->get('/', function () use ($router) {
 $router->get('customers', 'CustomersController@index');
 $router->get('produks', 'ProduksController@index');
 $router->get('bukus', 'BukusController@index');
+$router->post('bukus', 'BukusController@store');
+$router->get('bukus/{id}', 'BukusController@show');
+$router->put('bukus/{id}', 'BukusController@update');
+$router->delete('bukus/{id}', 'BukusController@destroy');
 $router->get('ebooks', 'EbooksController@index');
 $router->get('keranjangs', 'KeranjangsController@index');

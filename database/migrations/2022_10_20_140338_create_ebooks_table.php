@@ -14,7 +14,8 @@ class CreateEbooksTable extends Migration
     public function up()
     {
         Schema::create('ebooks', function (Blueprint $table) {
-            $table->id()->index('ebook_id_foreign');
+            $table->bigIncrements('id');
+            $table->integer('ebook_id');
             $table->String('judul_ebook', 100);
             $table->string('harga', 100);
             $table->timestamps();

@@ -14,8 +14,8 @@ class CreateProduksTable extends Migration
     public function up()
     {
         Schema::create('produks', function (Blueprint $table) {
-
-            $table->id()->index('produk_id_foreign');
+            $table->bigIncrements('id');
+            $table->integer('produk_id');
             $table->String('nama_produk', 100);
 
             $table->timestamps();

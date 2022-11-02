@@ -14,7 +14,8 @@ class CreateKeranjangsTable extends Migration
     public function up()
     {
         Schema::create('keranjangs', function (Blueprint $table) {
-            $table->id()->index('buku_id_foreign');
+            $table->bigIncrements('id');
+            $table->integer('keranjang_id');
             $table->String('judul_buku', 100);
             $table->string('jumlah_produk', 100);
             $table->string('total_harga', 100);
