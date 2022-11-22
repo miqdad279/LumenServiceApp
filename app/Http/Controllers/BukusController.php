@@ -4,25 +4,43 @@ namespace App\Http\Controllers;
 
 use App\Models\Buku;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Validator;
 
 class BukusController extends Controller {
 
     public function index(){
 
-        $bukus = Buku::OrderBy("id", "DESC")->paginate(10);
-
-        $outPut = [
-            "message" => "bukus",
-            "result" => $bukus
+        $bukus = Buku::OrderBy("id", "DESC")->paginate(2)->toArray();
+        $response = [
+            "total_count" => $bukus["total"],
+            "limit" => $bukus["per_page"],
+            "pagination" => [
+                "next_page" => $bukus["next_page_url"],
+                "current_page" => $bukus["current_page"]
+            ],
+            "data" => $bukus["data"],
         ];
-
-        return response()->json($bukus, 200);
+        return response()->json($response, 200);
     }
     
     public function store(Request $request){
         $input = $request->all();
-        $buku = Buku::create($input);
+        $validationRules = [
+            'buku_id' => 'required|exists:users,id',
+            'judul_buku' => 'required|min:5',
+            'penulis' => 'required|min:5',
+            'deskripsi' => 'required|min:10',
+            'harga' => 'required|min:5',
+            'rilis' => 'required|min:4',
+        ];
 
+        $validator = Validator::make($input, $validationRules);
+
+        if($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+        
+        $buku = Buku::create($input);
         return response()->json($buku, 200);
     }
 
