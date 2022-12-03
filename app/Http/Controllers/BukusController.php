@@ -4,62 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Models\Buku;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
 
 class BukusController extends Controller {
 
     public function index(Request $request){
-
-        $acceptHeader = $request->header('Accept');
-
-        if($acceptHeader === 'application/json' || $acceptHeader === 'application/xml'){
-
-            $bukus = Buku::OrderBy("id", "DESC")->paginate(10);
-
-            if($acceptHeader === 'application/json') {
-
-                return response()->json($bukus, 200);
-            } else {
-
-                $xml = new \SimpleXMLElement('<bukus/>');
-                foreach ($bukus->items('data') as $item) {
-                    $xmlItem = $xml->addChild('buku');
-
-                    $xmlItem->addChild('id', $item->id);
-                    $xmlItem->addChild('buku_id', $item->buku_id);
-                    $xmlItem->addChild('judul_buku', $item->judul_buku);
-                    $xmlItem->addChild('penulis', $item->penulis);
-                    $xmlItem->addChild('deskripsi', $item->deskripsi);
-                    $xmlItem->addChild('harga', $item->harga);
-                    $xmlItem->addChild('rilis', $item->rilis);
-                    $xmlItem->addChild('created_at', $item->created_at);
-                    $xmlItem->addChild('updated_at', $item->updated_at);
-                }
-                return $xml->asXML();
-            }
-        } else{
-            return response('Not Acceptable!', 406);
-        }
+        $bukus = Buku::OrderBy("id", "DESC")->paginate(2)->toArray();
+        $response = [
+            "total_count" => $bukus["total"],
+            "limit" => $bukus["per_page"],
+            "pagination" => [
+                "next_page" => $bukus["next_page_url"],
+                "current_page" => $bukus["current_page"]
+            ],
+            "data" => $bukus["data"],
+        ];
+        return response()->json($response, 200);
     }
     
     public function store(Request $request){
+        $input = $request->all();
+        $validationRules = [
+            // 'buku_id' => 'required|exists:users,id',
+            'buku_id' => 'required|min:3',
+            'judul_buku' => 'required|min:5',
+            'penulis' => 'required|min:5',
+            'deskripsi' => 'required|min:10',
+            'harga' => 'required|min:5',
+            'rilis' => 'required|min:4',
+        ];
 
-        $acceptHeader = $request->header('Accept');
+        $validator = Validator::make($input, $validationRules);
 
-        if($acceptHeader === 'application/json' || $acceptHeader === 'application/xml'){
-
-            $contentTypeHeader = $request->header('Content-Type');
-
-            if($contentTypeHeader === 'application/json') {
-                $input = $request->all();
-                $buku = Buku::create($input);
-
-                return response()->json($buku, 200);
-            } else {
-                return response('Unsupported Media Type', 415);
-            }
-        } else {
-            return response('Not Acceptable', 406);
-        } 
+        if($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+        
+        $buku = Buku::create($input);
+        return response()->json($buku, 200);
     }
 
     public function show($id){
@@ -78,6 +61,21 @@ class BukusController extends Controller {
         
         if(!$buku){
             abort(404);
+        }
+
+        $validationRules = [
+            'buku_id' => 'required|min:3',
+            'judul_buku' => 'required|min:5',
+            'penulis' => 'required|min:5',
+            'deskripsi' => 'required|min:10',
+            'harga' => 'required|min:5',
+            'rilis' => 'required|min:4',
+        ];
+
+        $validator = Validator::make($input, $validationRules);
+
+        if($validator->fails()) {
+            return response()->json($validator->errors(), 400);
         }
         
         $buku->fill($input);
