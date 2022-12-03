@@ -2,6 +2,8 @@
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
+use FastRoute\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -17,12 +19,22 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->get('customers', 'CustomersController@index');
+$router->group(['middleware' => ['auth']], function ($router) {
+    $router->get('bukus', 'BukusController@index');
+    $router->post('bukus', 'BukusController@store');
+    $router->get('bukus/{id}', 'BukusController@show');
+    $router->put('bukus/{id}', 'BukusController@update');
+    $router->delete('bukus/{id}', 'BukusController@destroy');
+});
+
+
 $router->get('produks', 'ProduksController@index');
-$router->get('bukus', 'BukusController@index');
-$router->post('bukus', 'BukusController@store');
-$router->get('bukus/{id}', 'BukusController@show');
-$router->put('bukus/{id}', 'BukusController@update');
-$router->delete('bukus/{id}', 'BukusController@destroy');
+$router->get('customers', 'CustomersController@index');
 $router->get('ebooks', 'EbooksController@index');
 $router->get('keranjangs', 'KeranjangsController@index');
+
+
+$router->group(['prefix' => 'auth'], function() use ($router) {
+    $router->post('/register', 'AuthController@register');
+    $router->post('/login', 'AuthController@login');
+});

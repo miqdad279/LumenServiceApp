@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Buku;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 
 class BukusController extends Controller {
 
     public function index(Request $request){
-        $bukus = Buku::OrderBy("id", "DESC")->paginate(2)->toArray();
+        $bukus = Buku::where(['id' => Auth::user()->id])->OrderBy("id", "DESC")->paginate(2)->toArray();
         $response = [
             "total_count" => $bukus["total"],
             "limit" => $bukus["per_page"],
