@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Buku;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Validator;
+
 
 class BukusController extends Controller {
 
@@ -26,7 +27,8 @@ class BukusController extends Controller {
     public function store(Request $request){
         $input = $request->all();
         $validationRules = [
-            'buku_id' => 'required|exists:users,id',
+            // 'buku_id' => 'required|exists:users,id',
+            'buku_id' => 'required|min:3',
             'judul_buku' => 'required|min:5',
             'penulis' => 'required|min:5',
             'deskripsi' => 'required|min:10',
@@ -60,6 +62,21 @@ class BukusController extends Controller {
         
         if(!$buku){
             abort(404);
+        }
+
+        $validationRules = [
+            'buku_id' => 'required|min:3',
+            'judul_buku' => 'required|min:5',
+            'penulis' => 'required|min:5',
+            'deskripsi' => 'required|min:10',
+            'harga' => 'required|min:5',
+            'rilis' => 'required|min:4',
+        ];
+
+        $validator = Validator::make($input, $validationRules);
+
+        if($validator->fails()) {
+            return response()->json($validator->errors(), 400);
         }
         
         $buku->fill($input);
