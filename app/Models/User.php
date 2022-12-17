@@ -43,4 +43,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return [];
     }
+
+    public function bukus(){
+        return $this->hasMany(Buku::class, 'id');
+    }
 }
